@@ -3,7 +3,7 @@ using System.Numerics;
 using System.Text;
 using Valve.VR;
 
-namespace ovr;
+namespace OAT_Tracked;
 
 class Program
 {

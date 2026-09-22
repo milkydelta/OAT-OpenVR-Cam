@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ovr;
+namespace OAT_Tracked;
 
 [Flags]
 public enum LIVnyan_cfg : int {
