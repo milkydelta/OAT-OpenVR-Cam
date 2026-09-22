@@ -7,31 +7,43 @@ namespace ovr;
 
 class Program
 {
-    static Valve.VR.CVRSystem vrSystem = null;
+    static CVRSystem vrSystem = null;
 
     static StringBuilder sb = new StringBuilder(512);
     static TrackedDevicePose_t[] poseArray = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
     static void Main(string[] args)
     {
-        Valve.VR.EVRInitError initError = Valve.VR.EVRInitError.None;
-
-        Console.WriteLine("Hello, World!");
-        vrSystem = Valve.VR.OpenVR.Init(ref initError, Valve.VR.EVRApplicationType.VRApplication_Background);
-        if (initError != Valve.VR.EVRInitError.None){ return;}
+        {
+            EVRApplicationType appType = EVRApplicationType.VRApplication_Background;
+            EVRInitError err = EVRInitError.None;
+            
+            Console.WriteLine($"Initialising OpenVR as {appType.ToString()}");
+            vrSystem = OpenVR.Init(ref err, appType);
+            if (err != EVRInitError.None){
+                Console.WriteLine($"Could not initialise OpenVR. Error: {err.ToString()}");
+                return;
+            }
+        }
+        
         Console.WriteLine("OpenVR runtime version: " +vrSystem.GetRuntimeVersion());
+        
+        Console.WriteLine("Listing tracked devices.");
+        
         
         for (uint i = 0; i < 16; i++)
         {
-            if (vrSystem.IsTrackedDeviceConnected(i))
-            {
-                Console.Write($"Index {i}: ");
-                Console.Write(vrSystem.GetTrackedDeviceClass(i));
-                Console.Write(" ");
-                Valve.VR.ETrackedPropertyError err = 0;
-                vrSystem.GetStringTrackedDeviceProperty(i, Valve.VR.ETrackedDeviceProperty.Prop_SerialNumber_String,sb, 500, ref err);
-                Console.WriteLine(sb.ToString());
-                sb.Clear();
-            }
+            bool connected = vrSystem.IsTrackedDeviceConnected(i);
+            ETrackedDeviceClass cl = vrSystem.GetTrackedDeviceClass(i);
+
+            ETrackedPropertyError err = ETrackedPropertyError.TrackedProp_Success;
+            sb.Clear();
+            vrSystem.GetStringTrackedDeviceProperty(i, ETrackedDeviceProperty.Prop_SerialNumber_String,sb, 500, ref err);
+            string serial = sb.ToString();
+            
+            if (err != ETrackedPropertyError.TrackedProp_Success){continue;}
+
+            Console.WriteLine($"Index {i} {connected} - Class {cl.ToString()} - Serial {serial}");
+            
         }
 
 
@@ -40,12 +52,11 @@ class Program
         for (int i = 0; i < poseArray.Length; i++)
         {
             var item = poseArray[i];
-            if (item.bDeviceIsConnected)
+            //if (item.bDeviceIsConnected)
             {
                 var mat = item.mDeviceToAbsoluteTracking.ToSystemNumericsMatrix();
 
-                Console.Write($"Index {i} Pos: ");
-                Console.WriteLine(mat.Translation);
+                Console.Write($"Index {i} Transform: ");
 
                 Vector3 pos;
                 Quaternion rot;
@@ -57,7 +68,9 @@ class Program
                     Console.Write(rot);
                     Console.Write(" ");
                     Console.Write(scale);
-                    Console.WriteLine(" ");
+                    Console.Write(" ");
+                    Console.Write(item.bDeviceIsConnected);
+                    Console.WriteLine("");
                 }
             }
         }
