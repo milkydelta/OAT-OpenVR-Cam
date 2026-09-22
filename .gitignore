@@ -1,5 +1,8 @@
-bin/*
-obj/*
-.vscode/*
+bin
+obj
+.vscode
+lib
 
 openvr_api.cs
+
+externalcamera.cfg

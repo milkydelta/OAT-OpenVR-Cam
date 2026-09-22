@@ -25,6 +25,8 @@ class ExternalCameraCfg {
 
     public void LoadFromFile(string path)
     {
+        Console.WriteLine($"Loading file {path}");
+
         if (!File.Exists(path)) {
             Console.WriteLine("LoadFromFile: file does not exist.");
             return;
@@ -67,6 +69,9 @@ class ExternalCameraCfg {
         if (dict.TryGetValue("fov", out string fovs)) {
             Single.TryParse(fovs,out fov);
         }
+
+        Console.Write("Read cfg: ");
+        Console.WriteLine(ToString());
     }
 
     static float DtoR(float degrees)
