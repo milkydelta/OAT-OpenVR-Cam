@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.IO;
+
 
 
 namespace ovr;
@@ -8,9 +11,39 @@ class ExternalCameraCfg {
     public float x,y,z = 0f;
     public float rx,ry,rz = 0f;
     public float fov = 0f;
-    public int index = 0;
 
-    public ExternalCameraCfg(Dictionary<string, string> dict) {
+    private void Reset()
+    {
+        x = 0f;
+        y = 0f;
+        z = 0f;
+        rx = 0f;
+        ry = 0f;
+        rz = 0f;
+        fov = 0f;
+    }
+
+    public void LoadFromFile(string path)
+    {
+        if (!File.Exists(path)) {
+            Console.WriteLine("LoadFromFile: file does not exist.");
+            return;
+        }
+
+        Dictionary<string,string> keyvalues = new Dictionary<string, string>();
+
+        foreach (string line in File.ReadAllLines(path)) {
+            if (line == ""){continue;}
+            var t = line.Split(new[] {'='}, 2);
+            if (t.Length == 2) {keyvalues[t[0]] = t[1];}
+        }
+
+        LoadFromDict(keyvalues);
+    }
+
+    public void LoadFromDict(Dictionary<string, string> dict) {
+        Reset();
+
         if (dict.TryGetValue("x", out string xs)) {
             Single.TryParse(xs,out x);
         }
@@ -34,11 +67,24 @@ class ExternalCameraCfg {
         if (dict.TryGetValue("fov", out string fovs)) {
             Single.TryParse(fovs,out fov);
         }
+    }
 
-        if (dict.TryGetValue("index", out string indexs)) {
-            Int32.TryParse(indexs,out index);
-            if (index >15) {index=0;}
-        }
+    static float DtoR(float degrees)
+    {
+        return (float)(degrees * Math.PI / 180d);
+    }
+
+    public (Vector3,Quaternion) ToVecQuat()
+    {
+        var vec = new Vector3(x, y, z);
+        var quat = Quaternion.CreateFromYawPitchRoll(DtoR(ry), DtoR(rx), DtoR(rz));
+        return (vec, quat);
+    }
+    public Matrix4x4 ToMatrix()
+    {
+        var t = Matrix4x4.CreateTranslation(x,y,z);
+        var r = Matrix4x4.CreateFromYawPitchRoll(DtoR(ry), DtoR(rx), DtoR(rz));
+        return t * r;
     }
     public override string ToString()
     {
