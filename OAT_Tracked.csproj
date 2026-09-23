@@ -16,6 +16,10 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>PCL</DefineConstants>
+  </PropertyGroup>
+
 
   <ItemGroup>
     <Content Include="lib/comm.so" Condition="Exists('lib/comm.so')" Link="%(Filename)%(Extension)">
@@ -30,10 +34,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="lib/OpenVR_LICENSE" Link="%(Filename)%(Extension)">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="licenses/*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
+
+
+  <!-- <ItemGroup>
+    <PackageReference Include="Mono.Options" Version="6.12.0.148" />
+  </ItemGroup> -->
 
 </Project>

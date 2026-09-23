@@ -3,6 +3,4 @@ obj
 .vscode
 lib
 
-openvr_api.cs
-
 externalcamera.cfg
