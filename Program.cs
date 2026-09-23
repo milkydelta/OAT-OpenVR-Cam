@@ -143,6 +143,7 @@ class Program
                     case ConsoleKey.Escape:
                         OpenVR.Shutdown();
                         vrSystem=null;
+                        com.Toggle(LIVnyan_cfg.CAM_ON);
                         Environment.Exit(0);
                         break;
                     default:
