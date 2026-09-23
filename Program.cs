@@ -18,6 +18,10 @@ class Program
     static string desiredSerial = "Z";
 
     static string memoryPath = "uk.lum.vrnyan.cameradata.v1.1";
+    static string cfgPath = "externalcamera.cfg";
+    static int verbose = 0;
+    static int rate = 60;
+    static UInt32 count=0;
 
     static void InitialiseOpenVR()
     {
@@ -37,6 +41,25 @@ class Program
 
     static void Main(string[] args)
     {
+        var op = new Mono.Options.OptionSet()
+        {
+            {"v", v => {if (v==null){verbose=0;}else{verbose++;}}},
+            {"c=|cfg=", v => cfgPath = v},
+            {"s=|serial=", v => desiredSerial = v},
+            {"m=|mmf=", v => memoryPath = v},
+            {"r=|rate=", v => Int32.TryParse(v, out rate)},
+        };
+
+        try
+        {
+            var unk = op.Parse(args);
+        }
+        catch (Mono.Options.OptionException e)
+        {
+            Console.WriteLine("OptionException: "+e.Message);
+            return;
+        }
+
         InitialiseOpenVR();
 
         if (args.Length > 0){desiredSerial = args[0];}
@@ -62,7 +85,7 @@ class Program
         Console.WriteLine($"Using device at index {desiredIndex}");
 
         var ccfg = new ExternalCameraCfg();
-        ccfg.LoadFromFile("externalcamera.cfg");
+        ccfg.LoadFromFile(cfgPath);
         offsetMatrix = ccfg.ToMatrix();
 
         var com = Comms.New();
@@ -102,16 +125,33 @@ class Program
                     Vector3 s, p;
                     Quaternion q;
                     Matrix4x4.Decompose(offsetMatrix * trackerMatrix, out s, out q, out p);
-                    Console.WriteLine($"{p} {q}");
+                    if (verbose >=2 || verbose>=1 && (count % rate ==0)){
+                        Console.WriteLine($"{p} {q}");
+                    }
+                    count++;
                     com.Write(p);
                     com.Write(q);
                 }
 
             }
 
+            while (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true);
+                switch (key.Key)
+                {
+                    case ConsoleKey.Escape:
+                        OpenVR.Shutdown();
+                        vrSystem=null;
+                        Environment.Exit(0);
+                        break;
+                    default:
+                    break;
+                }
+            }
 
-            //return;
-            System.Threading.Thread.Sleep(1000 / 10);
+            
+            System.Threading.Thread.Sleep(Math.Max(1000 / rate, 10));
 
         }
     }
