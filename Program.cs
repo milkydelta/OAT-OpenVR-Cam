@@ -62,8 +62,6 @@ class Program
 
         InitialiseOpenVR();
 
-        if (args.Length > 0){desiredSerial = args[0];}
-
         Console.WriteLine("Listing tracked devices.");
 
         for (uint i = 0; i < 16; i++)
