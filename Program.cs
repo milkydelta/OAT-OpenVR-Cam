@@ -106,7 +106,7 @@ class Program
 
                     Vector3 pos = hMat.GetPosition();
                     Quaternion quat = hMat.GetRotation();
-                    Matrix4x4 mat = Matrix4x4.CreateTranslation(pos) * Matrix4x4.CreateFromQuaternion(quat);
+                    Matrix4x4 mat = Matrix4x4.CreateFromQuaternion(quat) * Matrix4x4.CreateTranslation(pos);
                     if (verbose >= 3)
                     {
                         Console.WriteLine($"D: {pos} {quat}");

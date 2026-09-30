@@ -89,7 +89,7 @@ class ExternalCameraCfg {
     {
         var t = Matrix4x4.CreateTranslation(x,y,z);
         var r = Matrix4x4.CreateFromYawPitchRoll(DtoR(ry), DtoR(rx), DtoR(rz));
-        return t * r;
+        return r * t;
     }
     public override string ToString()
     {
