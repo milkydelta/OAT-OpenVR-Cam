@@ -100,27 +100,20 @@ class Program
                 poseArray[desiredIndex].bDeviceIsConnected &&
                 poseArray[desiredIndex].bPoseIsValid)
             {
-                var item = poseArray[desiredIndex];
-                var mat = item.mDeviceToAbsoluteTracking.ToSystemNumericsMatrix();
-
-                // Convert OpenVR coordinates to Unity.
-                // I need to find a way to do this without decomposing the matrix.
-                // The below method feels inefficient.
                 {
-                    Vector3 s, p;
-                    Quaternion q;
-                    Matrix4x4.Decompose(mat, out s, out q, out p);
-                    q.W = -q.W;
-                    q.X = -q.X;
-                    q.Y = -q.Y;
-                    p.Z = -p.Z;
-                    mat = Matrix4x4.CreateTranslation(p) * Matrix4x4.CreateFromQuaternion(q);
-                    if (verbose >=3){
-                        Console.WriteLine($"D: {p} {q}");
-                    }
-                }
+                    var item = poseArray[desiredIndex];
+                    var hMat = item.mDeviceToAbsoluteTracking;
 
-                trackerMatrix = mat;
+                    Vector3 pos = hMat.GetPosition();
+                    Quaternion quat = hMat.GetRotation();
+                    Matrix4x4 mat = Matrix4x4.CreateTranslation(pos) * Matrix4x4.CreateFromQuaternion(quat);
+                    if (verbose >= 3)
+                    {
+                        Console.WriteLine($"D: {pos} {quat}");
+                    }
+
+                    trackerMatrix = mat;
+                }
 
                 {
                     Vector3 s, p;

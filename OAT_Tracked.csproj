@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>PCL</DefineConstants>
+    <DefineConstants>PCL;UNITY_5_3_OR_NEWER</DefineConstants>
   </PropertyGroup>
 
 
