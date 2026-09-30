@@ -115,6 +115,9 @@ class Program
                     q.Y = -q.Y;
                     p.Z = -p.Z;
                     mat = Matrix4x4.CreateTranslation(p) * Matrix4x4.CreateFromQuaternion(q);
+                    if (verbose >=3){
+                        Console.WriteLine($"D: {p} {q}");
+                    }
                 }
 
                 trackerMatrix = mat;
